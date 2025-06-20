@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
-const AuthPage = () => {
+const AuthPage = ({ setAuthChanged }) => {
   const [mode, setMode] = useState('login');
   const [form, setForm] = useState({
     identifier: '',
@@ -10,19 +12,72 @@ const AuthPage = () => {
   });
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+  const [focusAnim, setFocusAnim] = useState(false);
+  const [joinAnim, setJoinAnim] = useState(false);
 
+  const navigate = useNavigate();
+
+  // Handle input changes
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = (e) => {
+  // Handle form submit
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Form submitted:', form);
+    setError('');
+    setSuccess('');
+    if (mode === 'login') {
+      await handleLogin();
+    } else {
+      await handleRegister();
+    }
   };
 
-  const [focusAnim, setFocusAnim] = useState(false);
-  const [joinAnim, setJoinAnim] = useState(false);
+  // Login logic
+  const handleLogin = async () => {
+    try {
+      const res = await axios.post('http://localhost:5000/api/auth/login', {
+        identifier: form.identifier,
+        password: form.password,
+      });
+      localStorage.setItem('token', res.data.token);
+      setSuccess('Login successful');
+      setError('');
+      if (setAuthChanged) setAuthChanged(val => !val); // Only if passed as prop
+      navigate('/dashboard');
+    } catch (err) {
+      setError(err.response?.data?.error || 'Login failed');
+      setSuccess('');
+      setForm(f => ({ ...f, password: '' })); // Clear password on failure
+    }
+  };
 
+  // Registration logic
+  const handleRegister = async () => {
+    try {
+      const res = await axios.post('http://localhost:5000/api/auth/register', {
+        username: form.username,
+        email: form.email,
+        password: form.password,
+      });
+      setSuccess(res.data.message || 'Registration successful! Please log in.');
+      setError('');
+      setMode('login');
+      setForm({
+        identifier: '',
+        username: '',
+        email: '',
+        password: ''
+      });
+    } catch (err) {
+      setError(err.response?.data?.error || 'Registration failed');
+      setSuccess('');
+      setForm(f => ({ ...f, password: '' })); // Clear password on failure
+    }
+  };
+
+  // Animation triggers
   const triggerFocusAnim = () => {
     setFocusAnim(false);
     setTimeout(() => setFocusAnim(true), 10);
@@ -33,19 +88,15 @@ const AuthPage = () => {
   };
 
   useEffect(() => {
-    if (mode === "login") {
-      setFocusAnim(true);
-    } else {
-      setJoinAnim(true);
-    }
-  }, []);
+    if (mode === "login") setFocusAnim(true);
+    else setJoinAnim(true);
+  }, [mode]);
 
-  
   return (
     <div className="min-h-screen flex items-center justify-center bg-cover bg-center" style={{ backgroundImage: "url('/images/BG.jpg')" }}>
       <div className="w-full max-w-3xl h-[500px]" style={{ perspective: '1000px' }}>
         <div className={`flip-card-inner ${mode === 'register' ? 'flipped' : ''}`}>
-          
+          {/* Login Side */}
           <div className="absolute inset-0 w-full h-full" style={{ backfaceVisibility: 'hidden' }}>
             <div className="w-full h-full bg-white rounded-3xl shadow-lg flex overflow-hidden">
               <div className="w-1/2 bg-[#F76C6C] flex flex-col justify-between p-10">
@@ -65,11 +116,9 @@ const AuthPage = () => {
                   className="w-48 mx-auto drop-shadow-[0_4px_8px_rgba(0,0,0,0.3)]"
                 />
               </div>
-              
               <div className="w-1/2 flex flex-col justify-center items-center px-12 py-10 h-full">
-                <div className="w-full max-w-sm" onSubmit={handleSubmit}>
+                <form className="w-full max-w-sm" onSubmit={handleSubmit}>
                   <h2 className="text-3xl font-extrabold mb-4 text-gray-800">Login</h2>
-                  
                   <div className="mb-2">
                     <label className="block mb-2 text-gray-700 text-base font-semibold">Email or Username</label>
                     <input
@@ -94,15 +143,13 @@ const AuthPage = () => {
                       className="w-full p-3 rounded-lg focus:outline-none transition duration-200 transform focus:[transform:scale(1.08)] bg-gray-50 shadow-md"
                     />
                   </div>
-                  
                   <button
                     type="submit"
-                    onClick={handleSubmit}
                     className="w-full bg-[#F76C6C] hover:bg-[#e65c5c] text-white font-bold py-3 rounded-lg shadow-lg transition duration-200 text-lg"
                   >
                     Login
                   </button>
-                  {error && <div className="mt-4 text-red-600 text-center">{error}</div>}
+                  {error && !success && <div className="mt-4 text-red-600 text-center">{error}</div>}
                   {success && <div className="mt-4 text-green-600 text-center">{success}</div>}
                   <div className="mt-8 text-center text-gray-600 text-sm">
                     Don&apos;t have an account?{' '}
@@ -117,11 +164,11 @@ const AuthPage = () => {
                       Create Account
                     </button>
                   </div>
-                </div>
+                </form>
               </div>
             </div>
           </div>
-          
+          {/* Register Side */}
           <div className="absolute inset-0 w-full h-full" style={{ backfaceVisibility: 'hidden', transform: 'rotateY(180deg)' }}>
             <div className="w-full h-full bg-white rounded-3xl shadow-lg flex overflow-hidden">
               <div className="w-1/2 bg-[#F76C6C] flex flex-col justify-between items-center p-10">
@@ -141,11 +188,9 @@ const AuthPage = () => {
                   className="w-48 mx-auto drop-shadow-[0_4px_8px_rgba(0,0,0,0.3)]"
                 />
               </div>
-              
               <div className="w-1/2 flex flex-col justify-center items-center px-12 py-10 h-full">
-                <div className="w-full max-w-sm" onSubmit={handleSubmit}>
+                <form className="w-full max-w-sm" onSubmit={handleSubmit}>
                   <h2 className="text-3xl font-extrabold mb-4 text-gray-800">Create Account</h2>
-                  
                   <div className='mb-2'>
                     <label className='block mb-2 text-gray-700 text-base font-semibold'>Username</label>
                     <input
@@ -181,15 +226,13 @@ const AuthPage = () => {
                       className="w-full p-3 rounded-lg focus:outline-none transition duration-200 transform focus:[transform:scale(1.08)] bg-gray-50 shadow-md"
                     />
                   </div>
-                  
                   <button
                     type="submit"
-                    onClick={handleSubmit}
                     className="w-full bg-[#F76C6C] hover:bg-[#e65c5c] text-white font-bold py-3 rounded-lg shadow-lg transition duration-200 text-lg"
                   >
                     Register
                   </button>
-                  {error && <div className="mt-4 text-red-600 text-center">{error}</div>}
+                  {error && !success && <div className="mt-4 text-red-600 text-center">{error}</div>}
                   {success && <div className="mt-4 text-green-600 text-center">{success}</div>}
                   <div className="mt-8 text-center text-gray-600 text-sm">
                     Already have an account?{' '}
@@ -204,11 +247,10 @@ const AuthPage = () => {
                       Login
                     </button>
                   </div>
-                </div>
+                </form>
               </div>
             </div>
           </div>
-          
         </div>
       </div>
     </div>

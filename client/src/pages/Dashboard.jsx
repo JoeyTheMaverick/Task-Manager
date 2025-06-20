@@ -9,23 +9,22 @@ export default function Dashboard() {
 
   useEffect(() => {
     // Set the Authorization header for this request
-    api.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('jwt-token');
+    api.defaults.headers.common['Authorization'] = 'Bearer ' + localStorage.getItem('token');
 
     api.get("/profile")
       .then(res => {
-        setProfile(res.data.user || res.data); // Adjust based on your backend response
+        setProfile(res.data.user || res.data); 
         setLoading(false);
       })
       .catch(err => {
         setLoading(false);
-        // If unauthorized, redirect to login
-        navigate("/login");
+        navigate("/auth");
       });
   }, [navigate]);
 
   const handleLogout = () => {
-    localStorage.removeItem("jwt-token");
-    navigate("/login");
+    localStorage.removeItem("token");
+    navigate("/auth");
   };
 
   if (loading) return <div className="p-4">Loading...</div>;

@@ -7,11 +7,14 @@ import Dashboard from './pages/Dashboard'
 import ProtectedRoute from './components/ProtectedRoute'
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [count, setCount] = useState(0);
+  const [authChanged, setAuthChanged] = useState(false);
+
 
   return (
     <Routes>
       <Route path='/auth' element={<Auth />} />
+      <Route path='/auth' element={<Auth setAuthChanged={setAuthChanged} />} />
       <Route path="/login" element={<Navigate to="/auth" replace />} />
       <Route path="/register" element={<Navigate to="/auth" replace />} />
       <Route element={<ProtectedRoute />}>

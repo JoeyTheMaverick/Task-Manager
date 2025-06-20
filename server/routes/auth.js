@@ -3,6 +3,8 @@ const router = express.Router();
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const verifyJWT = require('../middleware/auth');
+
 
 router.post('/register', async (req, res) => {
   try {
@@ -41,5 +43,10 @@ router.post('/login', async (req, res) => {
     res.status(400).json({ error: 'Login failed' });
   }
 });
+
+router.get('/protected', verifyJWT, (req, res) => {
+  res.json({ message: "You have accessed a protected route!" });
+});
+
 
 module.exports = router;
