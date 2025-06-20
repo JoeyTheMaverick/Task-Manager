@@ -38,3 +38,22 @@
 .animate-jump-once {
   animation: jump-once 1.5s cubic-bezier(0.4, 0, 0.2, 1) 1;
 }
+
+
+@keyframes typewriter {
+  from { width: 0 }
+  to { width: 17ch; } /* Adjust 17 to match your text length */
+}
+@keyframes blinkCaret {
+  0%, 100% { border-color: transparent; }
+  50% { border-color: #F76C6C; }
+}
+.typewriter {
+  overflow: hidden;
+  white-space: nowrap;
+  border-right: 2px solid #F76C6C;
+  width: 0;
+  animation:
+    typewriter 2.5s steps(17) forwards,
+    blinkCaret 0.75s step-end infinite;
+}

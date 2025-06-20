@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom';
 import './index.css';
 import './App.css'
+import Home from './pages/Home'
 import Auth from './pages/Auth'
 import Dashboard from './pages/Dashboard'
 import ProtectedRoute from './components/ProtectedRoute'
@@ -13,6 +14,7 @@ function App() {
 
   return (
     <Routes>
+      <Route path="/" element={<Home />} />
       <Route path='/auth' element={<Auth />} />
       <Route path='/auth' element={<Auth setAuthChanged={setAuthChanged} />} />
       <Route path="/login" element={<Navigate to="/auth" replace />} />
