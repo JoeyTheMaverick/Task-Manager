@@ -1,9 +1,8 @@
 import { useState } from 'react'
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import './index.css';
 import './App.css'
-import Register from './pages/Register';
-import Login from './pages/Login'
+import Auth from './pages/Auth'
 import Dashboard from './pages/Dashboard'
 import ProtectedRoute from './components/ProtectedRoute'
 
@@ -12,8 +11,9 @@ function App() {
 
   return (
     <Routes>
-      <Route path='/register' element={<Register />} />
-      <Route path="/login" element={<Login />} />
+      <Route path='/auth' element={<Auth />} />
+      <Route path="/login" element={<Navigate to="/auth" replace />} />
+      <Route path="/register" element={<Navigate to="/auth" replace />} />
       <Route element={<ProtectedRoute />}>
         <Route path="/dashboard" element={<Dashboard />} />
       </Route>
