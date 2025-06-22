@@ -14,7 +14,7 @@ const Home = () => {
       <main className="relative z-10 bg-white/80 backdrop-blur-lg shadow-2xl rounded-3xl px-10 py-14 max-w-lg w-full flex flex-col items-center">
         <img src="/images/Logo.png" alt="ZenTask Logo" className="w-16 h-16 mb-6 drop-shadow-lg" />
         <h1 className="typewriter font-['Alice','serif'] text-4xl font-extrabold text-gray-800 mb-2 tracking-tight">
-          Welcome to <span className="text-[#F76C6C]">ZenTask&nbsp;</span>
+          Welcome to <span className="text-[#F76C6C]">ZenTask</span>
         </h1>
         <p className="font-['Lora','serif'] text-lg text-gray-600 mb-8 text-center">
           Organize, focus, and achieve your goals with style.
